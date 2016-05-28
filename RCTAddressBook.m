@@ -89,7 +89,7 @@ withCallback:(RCTResponseSenderBlock) callback
   NSString *firstName = (__bridge_transfer NSString *)(ABRecordCopyValue(person, kABPersonFirstNameProperty));
   NSString *lastName = (__bridge_transfer NSString *)(ABRecordCopyValue(person, kABPersonLastNameProperty));
   NSString *middleName = (__bridge_transfer NSString *)(ABRecordCopyValue(person, kABPersonMiddleNameProperty));
-  NSString *prefix = (__bridge_transfer NSString *)ABRecordCopyValue(ref,kABPersonPrefixProperty);
+  NSString *prefix = (__bridge_transfer NSString *)ABRecordCopyValue(person, kABPersonPrefixProperty);
 
   [contact setObject: recordID forKey: @"recordID"];
 
