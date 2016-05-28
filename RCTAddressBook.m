@@ -41,6 +41,7 @@ RCT_EXPORT_METHOD(requestPermission:(RCTResponseSenderBlock) callback)
 RCT_EXPORT_METHOD(getContacts:(RCTResponseSenderBlock) callback)
 {
   ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(NULL, nil);
+
   int authStatus = ABAddressBookGetAuthorizationStatus();
   if(authStatus != kABAuthorizationStatusAuthorized){
     ABAddressBookRequestAccessWithCompletion(addressBookRef, ^(bool granted, CFErrorRef error) {
@@ -88,6 +89,7 @@ withCallback:(RCTResponseSenderBlock) callback
   NSString *firstName = (__bridge_transfer NSString *)(ABRecordCopyValue(person, kABPersonFirstNameProperty));
   NSString *lastName = (__bridge_transfer NSString *)(ABRecordCopyValue(person, kABPersonLastNameProperty));
   NSString *middleName = (__bridge_transfer NSString *)(ABRecordCopyValue(person, kABPersonMiddleNameProperty));
+  NSString *prefix = (__bridge_transfer NSString *)ABRecordCopyValue(ref,kABPersonPrefixProperty);
 
   [contact setObject: recordID forKey: @"recordID"];
 
@@ -109,6 +111,10 @@ withCallback:(RCTResponseSenderBlock) callback
   if(!hasName){
     //nameless contact, do not include in results
     return nil;
+  }
+  
+  if(prefix) {
+    [contact setObject: prefix forKey:@"prefix"];
   }
 
   //handle phone numbers
@@ -232,9 +238,13 @@ RCT_EXPORT_METHOD(updateContact:(NSDictionary *)contactData callback:(RCTRespons
   NSString *firstName = [contactData valueForKey:@"firstName"];
   NSString *lastName = [contactData valueForKey:@"lastName"];
   NSString *middleName = [contactData valueForKey:@"middleName"];
+  NSString *prefix = [contactData valueForKey:@"prefix"];
+
   ABRecordSetValue(record, kABPersonFirstNameProperty, (__bridge CFStringRef) firstName, &error);
   ABRecordSetValue(record, kABPersonLastNameProperty, (__bridge CFStringRef) lastName, &error);
   ABRecordSetValue(record, kABPersonMiddleNameProperty, (__bridge CFStringRef) middleName, &error);
+  ABRecordSetValue(record, kABPersonPrefixProperty, (__bridge CFStringRef) prefix, &error);
+
 
   ABMutableMultiValueRef multiPhone = ABMultiValueCreateMutable(kABMultiStringPropertyType);
   NSArray* phoneNumbers = [contactData valueForKey:@"phoneNumbers"];
